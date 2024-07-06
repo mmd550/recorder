@@ -218,7 +218,7 @@ export function createMediaRecorder() {
       return
     }
 
-    const name = fileName || 'test.webm'
+    const name = `${fileName}.webm` || 'test.webm'
     const blob = new Blob(recordedBlobList, { type: supportedType })
     const url = window.URL.createObjectURL(blob)
 
