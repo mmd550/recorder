@@ -81,6 +81,7 @@ export function createMediaRecorder() {
       'video/webm;',
       'video/mpeg',
     ]
+    supportedType = undefined
 
     for (const i in mimeTypes) {
       if (MediaRecorder.isTypeSupported(mimeTypes[i])) {
@@ -134,7 +135,6 @@ export function createMediaRecorder() {
     targetStream?.getTracks().forEach(track => track.stop())
     targetStream = null
     mediaRecorder = null
-    supportedType = undefined
   }
 
   async function createTargetStream(stream: MediaStream) {
