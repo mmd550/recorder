@@ -21,4 +21,6 @@
   },
   "include": ["src"],
   "exclude": ["src/demo/dev.main.tsx"],
+  "typeRoots": ["./src/types", "node_modules/@types"]
+
 }

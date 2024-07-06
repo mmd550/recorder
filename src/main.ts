@@ -1,4 +1,4 @@
-import { useCallRecorder } from "./lib/use-call-recorder.ts";
-import { createCallRecorder } from "./lib/call-recorder.ts";
+import { useCallRecorder } from './lib/hooks/use-call-recorder.ts'
+import { createMediaRecorder } from './lib/media-recorder.ts'
 
-export { useCallRecorder, createCallRecorder };
+export { useCallRecorder, createMediaRecorder }

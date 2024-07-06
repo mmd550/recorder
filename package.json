@@ -1,17 +1,17 @@
 {
-  "name": "@weblite/call-recorder",
+  "name": "@weblite/media-recorder",
   "version": "0.0.1",
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/call-recorder.umd.cjs",
-  "module": "./dist/call-recorder.js",
-  "types": "./dist/call-recorder.d.ts",
+  "main": "./dist/media-recorder.umd.cjs",
+  "module": "./dist/media-recorder.js",
+  "types": "./dist/media-recorder.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/call-recorder.js",
-      "require": "./dist/call-recorder.umd.cjs"
+      "import": "./dist/media-recorder.js",
+      "require": "./dist/media-recorder.umd.cjs"
     }
   },
   "scripts": {
@@ -43,6 +43,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "prettier": "^3.3.2",
     "rimraf": "^5.0.8",
     "typescript": "^5.2.2",
     "vite": "^5.3.1",

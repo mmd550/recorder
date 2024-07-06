@@ -1,20 +1,20 @@
-import { useCallback, useRef, useState } from "react";
-import "./App.css";
-import { useCallRecorder } from "../lib/use-call-recorder.ts";
+import { useCallback, useRef, useState } from 'react'
+import './App.css'
+import { useCallRecorder } from '../lib/hooks/use-call-recorder.ts'
 
-let firstAudioStream: MediaStream | null;
-let secondAudioStream: MediaStream | null;
-let micAudioStream: MediaStream | null;
+let firstAudioStream: MediaStream | null
+let secondAudioStream: MediaStream | null
+let micAudioStream: MediaStream | null
 
 interface HTMLMediaElementWithCaptureStream extends HTMLMediaElement {
-  captureStream(): MediaStream;
+  captureStream(): MediaStream
 }
 
-type AudioState = "off" | "on";
+type AudioState = 'off' | 'on'
 
 function App() {
-  const firstAudioRef = useRef<HTMLAudioElement>(null);
-  const secondAudioRef = useRef<HTMLAudioElement>(null);
+  const firstAudioRef = useRef<HTMLAudioElement>(null)
+  const secondAudioRef = useRef<HTMLAudioElement>(null)
 
   const {
     start,
@@ -23,94 +23,94 @@ function App() {
     deleteAudioTrack,
     addAudioTrack,
     download,
-  } = useCallRecorder();
+  } = useCallRecorder()
 
   const [audioState, setAudioState] = useState<{
-    audio1: AudioState;
-    audio2: AudioState;
-    mic: AudioState;
+    audio1: AudioState
+    audio2: AudioState
+    mic: AudioState
   }>({
-    audio1: "off",
-    audio2: "off",
-    mic: "off",
-  });
+    audio1: 'off',
+    audio2: 'off',
+    mic: 'off',
+  })
 
   const toggleFirstAudio = useCallback(() => {
-    const audio = firstAudioRef.current;
-    if (!audio) return;
+    const audio = firstAudioRef.current
+    if (!audio) return
 
-    if (audioState.audio1 === "off") {
-      audio?.play();
+    if (audioState.audio1 === 'off') {
+      audio?.play()
       if (!firstAudioStream) {
         firstAudioStream = (
           audio as HTMLMediaElementWithCaptureStream
-        ).captureStream();
+        ).captureStream()
       }
-      addAudioTrack(firstAudioStream.getAudioTracks()[0]);
-      setAudioState((state) => ({ ...state, audio1: "on" }));
-    } else if (audioState.audio1 === "on") {
-      audio.pause();
+      addAudioTrack(firstAudioStream.getAudioTracks()[0])
+      setAudioState(state => ({ ...state, audio1: 'on' }))
+    } else if (audioState.audio1 === 'on') {
+      audio.pause()
       if (firstAudioStream) {
-        deleteAudioTrack(firstAudioStream.getAudioTracks()[0]);
+        deleteAudioTrack(firstAudioStream.getAudioTracks()[0])
       }
-      setAudioState((state) => ({ ...state, audio1: "off" }));
+      setAudioState(state => ({ ...state, audio1: 'off' }))
     }
-  }, [audioState, addAudioTrack, deleteAudioTrack]);
+  }, [audioState, addAudioTrack, deleteAudioTrack])
 
   const toggleSecondAudio = useCallback(() => {
-    const audio = secondAudioRef.current;
-    if (!audio) return;
+    const audio = secondAudioRef.current
+    if (!audio) return
 
-    if (audioState.audio2 === "off") {
-      audio?.play();
+    if (audioState.audio2 === 'off') {
+      audio?.play()
       if (!secondAudioStream) {
         secondAudioStream = (
           audio as HTMLMediaElementWithCaptureStream
-        ).captureStream();
+        ).captureStream()
       }
-      addAudioTrack(secondAudioStream.getAudioTracks()[0]);
-      setAudioState((state) => ({ ...state, audio2: "on" }));
+      addAudioTrack(secondAudioStream.getAudioTracks()[0])
+      setAudioState(state => ({ ...state, audio2: 'on' }))
     } else {
-      audio.pause();
+      audio.pause()
       if (secondAudioStream) {
-        deleteAudioTrack(secondAudioStream.getAudioTracks()[0]);
+        deleteAudioTrack(secondAudioStream.getAudioTracks()[0])
       }
-      setAudioState((state) => ({ ...state, audio2: "off" }));
+      setAudioState(state => ({ ...state, audio2: 'off' }))
     }
-  }, [audioState, addAudioTrack, deleteAudioTrack]);
+  }, [audioState, addAudioTrack, deleteAudioTrack])
 
   const toggleMicAudio = useCallback(async () => {
-    if (audioState.mic === "off") {
+    if (audioState.mic === 'off') {
       if (!micAudioStream) {
         micAudioStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
           video: false,
-        });
+        })
       }
-      addAudioTrack(micAudioStream.getAudioTracks()[0]);
-      setAudioState((state) => ({ ...state, mic: "on" }));
-    } else if (audioState.mic === "on") {
+      addAudioTrack(micAudioStream.getAudioTracks()[0])
+      setAudioState(state => ({ ...state, mic: 'on' }))
+    } else if (audioState.mic === 'on') {
       if (micAudioStream) {
-        deleteAudioTrack(micAudioStream.getAudioTracks()[0]);
+        deleteAudioTrack(micAudioStream.getAudioTracks()[0])
       }
-      setAudioState((state) => ({ ...state, mic: "off" }));
+      setAudioState(state => ({ ...state, mic: 'off' }))
     }
-  }, [audioState, addAudioTrack, deleteAudioTrack]);
+  }, [audioState, addAudioTrack, deleteAudioTrack])
 
   const reset = useCallback(() => {
-    firstAudioRef.current?.pause();
-    secondAudioRef.current?.pause();
-    setAudioState({ mic: "off", audio1: "off", audio2: "off" });
+    firstAudioRef.current?.pause()
+    secondAudioRef.current?.pause()
+    setAudioState({ mic: 'off', audio1: 'off', audio2: 'off' })
 
-    micAudioStream = null;
-    firstAudioStream = null;
-    secondAudioStream = null;
-  }, []);
+    micAudioStream = null
+    firstAudioStream = null
+    secondAudioStream = null
+  }, [])
 
   const stopRecording = useCallback(() => {
-    stop();
-    reset();
-  }, [reset, stop]);
+    stop()
+    reset()
+  }, [reset, stop])
 
   return (
     <>
@@ -131,7 +131,7 @@ function App() {
 
       <audio ref={secondAudioRef} src="/audio/PinkPanther60.wav"></audio>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
