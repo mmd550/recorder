@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { createCallRecorder } from "./call-recorder";
+import { createCallRecorder } from "./call-recorder.ts";
 
 export function useCallRecorder() {
   const recorderRef = useRef<ReturnType<typeof createCallRecorder>>();

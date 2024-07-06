@@ -1,7 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import "./App.css";
-import { createCallRecorder } from "./call-recorder";
-import { useCallRecorder } from "./use-call-recorder";
+import { useCallRecorder } from "../lib/use-call-recorder.ts";
 
 let firstAudioStream: MediaStream | null;
 let secondAudioStream: MediaStream | null;

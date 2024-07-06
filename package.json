@@ -1,19 +1,40 @@
 {
-  "name": "recorder",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@weblite/call-recorder",
+  "version": "0.0.1",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/call-recorder.umd.cjs",
+  "module": "./dist/call-recorder.js",
+  "types": "./dist/call-recorder.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/call-recorder.js",
+      "require": "./dist/call-recorder.umd.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite",
+    "prebuild": "rimraf dist/*",
     "build": "tsc -b && vite build",
+    "postbuild": "rimraf dist/vite.svg && rimraf dist/audio",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prepub": "yarn build",
+    "prepub:alpha": "yarn build",
+    "pub:alpha": "npm publish --tag alpha",
+    "pub": "npm publish --tag latest"
+  },
+  "publishConfig": {
+    "@weblite:registry": "https://git.weblite.me/api/v4/projects/207/packages/npm/"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@types/node": "^20.14.10",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
@@ -22,7 +43,9 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "rimraf": "^5.0.8",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1"
+    "vite": "^5.3.1",
+    "vite-plugin-dts": "^3.9.1"
   }
 }
