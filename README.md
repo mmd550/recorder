@@ -1,30 +1,75 @@
-# React + TypeScript + Vite
+# Media Recorder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This package is implemented to achieve:
 
-Currently, two official plugins are available:
+- Recording media including video and audio
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Being able to add and remove audio tracks during record
 
-## Expanding the ESLint configuration
+## Library Core API
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
+```ts
+export declare function createMediaRecorder(): {
+  startRecording: (stream?: MediaStream) => Promise<undefined>
+  stopRecording: () => void
+  downloadRecording: (fileName?: string) => void
+  deleteAudioTrack: (track: MediaStreamTrack) => void
+  addAudioTrack: (track: MediaStreamTrack) => void
 }
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+- createMediaRecorder: Creates a recorder instance and returns it.
+
+- startRecording: Gets an ongoing media stream and starts recording it. If no stream is provided to the function it creates and empty stream.
+
+- downloadRecording: Downloads the recorded media. You can call this function during recording and it saves the recorded media until now.
+
+- addAudioTrack: Gets an audio track and connects it to media recorder.
+
+- deleteAudioTrack: Disconnects provided audio track from media recorder.
+
+## Hooks
+
+```ts
+export declare function useCallRecorder(): {
+  start: () => Promise<void>
+  stop: () => void
+  download: (fileName?: string) => void
+  addAudioTrack: (audioTrack: MediaStreamTrack) => void
+  deleteAudioTrack: (audioTrack: MediaStreamTrack) => void
+  isRecording: boolean
+}
+```
+
+## Important Implementation Details
+
+### 1. Adding and removing audio tracks from mediaRecorder
+
+Adding and removing audio tracks from mediaRecorder during recording is not possible. And also we can not add multiple audio tracks to mediaRecorder. So I we had to use audioContext api and create a single audioStream and add tracks to the context instead.
+
+Create audio track with audio context and add it to recording stream:
+
+```ts
+//  Global variables
+const audioContext = new AudioContext()
+const audioDestination = audioContext.createMediaStreamDestination()
+let mediaRecorder
+
+//  Create main audio stream and add to media recorder
+const audioTrack = audioDestination.stream.getAudioTracks()[0]
+const resultStream = new MediaStream()
+resultStream.addTrack(audioTrack)
+mediaRecorder = new MediaRecorder(targetStream, options)
+```
+
+Add new tracks to audio stream:
+
+```ts
+function addTrack(track: MediaStreamTrack) {
+  const audioStream = new MediaStream()
+  audioStream.addTrack(track)
+
+  const sourceNode = audioContext.createMediaStreamSource(audioStream)
+  sourceNode.connect(audioDestination)
+}
+```

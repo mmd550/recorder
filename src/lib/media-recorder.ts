@@ -3,6 +3,45 @@ interface MimeType {
   extension: string
 }
 
+const mimeTypes: MimeType[] = [
+  {
+    type: 'video/mp4',
+    extension: '.mp4',
+  },
+  {
+    type: 'video/mpeg',
+    extension: '.mp4',
+  },
+  {
+    type: 'video/webm; codecs="vp9, opus"',
+    extension: '.webm',
+  },
+  {
+    type: 'video/webm; codecs="vp8, opus"',
+    extension: '.webm',
+  },
+  {
+    type: 'video/webm; codecs=vp9',
+    extension: '.webm',
+  },
+  {
+    type: 'video/webm; codecs=vp8',
+    extension: '.webm',
+  },
+  {
+    type: 'video/webm; codecs=daala',
+    extension: '.webm',
+  },
+  {
+    type: 'video/webm; codecs=h264',
+    extension: '.webm',
+  },
+  {
+    type: 'video/webm;',
+    extension: '.webm',
+  },
+]
+
 export function createMediaRecorder() {
   // Audio Part
   const sourceNodeMap = new Map<string, MediaStreamAudioSourceNode>()
@@ -75,45 +114,7 @@ export function createMediaRecorder() {
     }
   }
 
-  async function startRecording(stream: MediaStream) {
-    const mimeTypes: MimeType[] = [
-      {
-        type: 'video/mp4',
-        extension: '.mp4',
-      },
-      {
-        type: 'video/mpeg',
-        extension: '.mp4',
-      },
-      {
-        type: 'video/webm; codecs="vp9, opus"',
-        extension: '.webm',
-      },
-      {
-        type: 'video/webm; codecs="vp8, opus"',
-        extension: '.webm',
-      },
-      {
-        type: 'video/webm; codecs=vp9',
-        extension: '.webm',
-      },
-      {
-        type: 'video/webm; codecs=vp8',
-        extension: '.webm',
-      },
-      {
-        type: 'video/webm; codecs=daala',
-        extension: '.webm',
-      },
-      {
-        type: 'video/webm; codecs=h264',
-        extension: '.webm',
-      },
-      {
-        type: 'video/webm;',
-        extension: '.webm',
-      },
-    ]
+  async function startRecording(stream?: MediaStream) {
     supportedMimeType = undefined
 
     for (const i in mimeTypes) {
@@ -170,7 +171,7 @@ export function createMediaRecorder() {
     mediaRecorder = null
   }
 
-  async function createTargetStream(stream: MediaStream) {
+  async function createTargetStream(stream?: MediaStream) {
     stream = stream || new MediaStream()
 
     if (!(stream instanceof MediaStream)) {
