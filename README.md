@@ -18,15 +18,15 @@ export declare function createMediaRecorder(): {
 }
 ```
 
-- createMediaRecorder: Creates a recorder instance and returns it.
+- `createMediaRecorder`: Creates a recorder instance and returns it.
 
-- startRecording: Gets an ongoing media stream and starts recording it. If no stream is provided to the function it creates and empty stream.
+- `startRecording`: Gets an ongoing media stream and starts recording it. If no stream is provided to the function it creates and empty stream.
 
-- downloadRecording: Downloads the recorded media. You can call this function during recording and it saves the recorded media until now.
+- `downloadRecording`: Downloads the recorded media. You can call this function during recording and it saves the recorded media until now.
 
-- addAudioTrack: Gets an audio track and connects it to media recorder.
+- `addAudioTrack`: Gets an audio track and connects it to media recorder.
 
-- deleteAudioTrack: Disconnects provided audio track from media recorder.
+- `deleteAudioTrack`: Disconnects provided audio track from media recorder.
 
 ## Hooks
 
@@ -45,7 +45,7 @@ export declare function useCallRecorder(): {
 
 ### 1. Adding and removing audio tracks from mediaRecorder
 
-Adding and removing audio tracks from mediaRecorder during recording is not possible. And also we can not add multiple audio tracks to mediaRecorder. So I we had to use audioContext api and create a single audioStream and add tracks to the context instead.
+Adding and removing audio tracks from mediaRecorder during recording is not possible. And also we can not add multiple audio tracks to mediaRecorder. So we had to use `audioContext` api and create a single audioStream and add tracks to the context instead.
 
 Create audio track with audio context and add it to recording stream:
 
