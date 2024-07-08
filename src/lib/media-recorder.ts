@@ -236,7 +236,7 @@ export function createMediaRecorder() {
     mediaRecorder?.stop()
   }
 
-  function downloadRecording(fileName?: string) {
+  function saveRecording(fileName?: string) {
     if (!recordedBlobList.length) {
       console.error('There is no recorded data')
       return
@@ -300,7 +300,7 @@ export function createMediaRecorder() {
   return {
     startRecording,
     stopRecording,
-    downloadRecording,
+    saveRecording,
     deleteAudioTrack,
     addAudioTrack,
   }

@@ -16,14 +16,8 @@ function App() {
   const firstAudioRef = useRef<HTMLAudioElement>(null)
   const secondAudioRef = useRef<HTMLAudioElement>(null)
 
-  const {
-    start,
-    stop,
-    isRecording,
-    deleteAudioTrack,
-    addAudioTrack,
-    download,
-  } = useCallRecorder()
+  const { start, stop, isRecording, deleteAudioTrack, addAudioTrack, save } =
+    useCallRecorder({ saveDuringRecordIntervalMS: 5000 ,fileNamePrefix:"prefix"})
 
   const [audioState, setAudioState] = useState<{
     audio1: AudioState
@@ -125,7 +119,7 @@ function App() {
         MIC {audioState.mic}
       </button>
       <button onClick={stopRecording}>Stop Recording</button>
-      <button onClick={() => download()}>Download Recording</button>
+      <button onClick={() => save()}>Download Recording</button>
 
       <audio ref={firstAudioRef} src="/audio/StarWars60.wav"></audio>
 

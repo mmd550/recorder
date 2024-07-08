@@ -10,19 +10,19 @@ This package is implemented to achieve:
 
 ```ts
 export declare function createMediaRecorder(): {
-  startRecording: (stream?: MediaStream) => Promise<undefined>
-  stopRecording: () => void
-  downloadRecording: (fileName?: string) => void
-  deleteAudioTrack: (track: MediaStreamTrack) => void
-  addAudioTrack: (track: MediaStreamTrack) => void
-}
+    startRecording: (stream?: MediaStream) => Promise<undefined>;
+    stopRecording: () => void;
+    saveRecording: (fileName?: string) => void;
+    deleteAudioTrack: (track: MediaStreamTrack) => void;
+    addAudioTrack: (track: MediaStreamTrack) => void;
+};
 ```
 
 - `createMediaRecorder`: Creates a recorder instance and returns it.
 
 - `startRecording`: Gets an ongoing media stream and starts recording it. If no stream is provided to the function it creates and empty stream.
 
-- `downloadRecording`: Downloads the recorded media. You can call this function during recording and it saves the recorded media until now.
+- `saveRecording`: Saves the recorded media in device. You can call this function during recording and it saves the recorded media until now.
 
 - `addAudioTrack`: Gets an audio track and connects it to media recorder.
 
@@ -31,15 +31,24 @@ export declare function createMediaRecorder(): {
 ## Hooks
 
 ```ts
-export declare function useCallRecorder(): {
-  start: () => Promise<void>
-  stop: () => void
-  download: (fileName?: string) => void
-  addAudioTrack: (audioTrack: MediaStreamTrack) => void
-  deleteAudioTrack: (audioTrack: MediaStreamTrack) => void
-  isRecording: boolean
+declare interface Props {
+    saveDuringRecordIntervalMS?: number;
+    fileNamePrefix?: string;
 }
+
+export declare function useCallRecorder(props?: Props): {
+    start: () => Promise<void>;
+    stop: () => void;
+    save: (fileName?: string) => void;
+    addAudioTrack: (audioTrack: MediaStreamTrack) => void;
+    deleteAudioTrack: (audioTrack: MediaStreamTrack) => void;
+    isRecording: boolean;
+};
 ```
+
+- `saveDuringRecordIntervalMS`: If there is a need to save recorded media periodically (for example to prevent data loss if the process has been killed), you can provide this prop and the recorded media will be saved to user's device every `saveDuringRecordIntervalMS` milliseconds. A postfix will be added to file name which indicates the recording start and end time from start of the record in seconds.(for example `[fileName].0-63.mp4`)
+
+- `fileNamePrefix`: Will be added before file name for each `save` call.
 
 ## Important Implementation Details
 
