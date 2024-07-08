@@ -45,19 +45,17 @@ const mimeTypes: MimeType[] = [
 /**
  *
  * @param timeSlice – The number of milliseconds to record into each Blob.
- * @param onDataAvailable - Fired after each slice of data is available
+ * @param onDataAvailable - Fired when next slice of data is available.
  */
 export function createMediaRecorder(
   timeSlice = 2000,
   onDataAvailable: () => void = () => {},
 ) {
-  // Audio Part
   const sourceNodeMap = new Map<string, MediaStreamAudioSourceNode>()
   let audioContext: AudioContext | null
   let audioDestination: MediaStreamAudioDestinationNode | null
   let mutedSourceNode: AudioBufferSourceNode | null
 
-  // Recording Part
   let targetStream: MediaStream | null
   let recordedBlobList: Blob[]
   let mediaRecorder: MediaRecorder | null

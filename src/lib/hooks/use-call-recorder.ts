@@ -48,8 +48,12 @@ export function useCallRecorder(props?: Props) {
     const screenStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
     })
-    const recorder = createMediaRecorder()
+    const recorder = createMediaRecorder(
+      saveDuringRecordIntervalMS,
+      saveDuringRecordIntervalMS ? save : undefined,
+    )
 
+    if (saveDuringRecordIntervalMS) startTimeRef.current = performance.now()
     recorder.startRecording(screenStream)
     recorderRef.current = recorder
     setIsRecording(true)
