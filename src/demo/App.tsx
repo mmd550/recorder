@@ -17,7 +17,10 @@ function App() {
   const secondAudioRef = useRef<HTMLAudioElement>(null)
 
   const { start, stop, isRecording, deleteAudioTrack, addAudioTrack, save } =
-    useCallRecorder({ saveDuringRecordIntervalMS: 5000 ,fileNamePrefix:"prefix"})
+    useCallRecorder({
+      saveDuringRecordIntervalMS: 10000,
+      fileNamePrefix: 'prefix',
+    })
 
   const [audioState, setAudioState] = useState<{
     audio1: AudioState

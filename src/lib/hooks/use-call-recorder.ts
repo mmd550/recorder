@@ -11,7 +11,6 @@ export function useCallRecorder(props?: Props) {
 
   const recorderRef = useRef<ReturnType<typeof createMediaRecorder>>()
   const [isRecording, setIsRecording] = useState(false)
-  const downloadInterval = useRef<NodeJS.Timeout>()
   const startTimeRef = useRef<number>()
 
   const stop = useCallback(() => {
@@ -19,7 +18,6 @@ export function useCallRecorder(props?: Props) {
     if (!recorder) return
     recorder.stopRecording()
     setIsRecording(false)
-    if (downloadInterval.current) clearInterval(downloadInterval.current)
   }, [])
 
   const save = useCallback(
@@ -55,20 +53,9 @@ export function useCallRecorder(props?: Props) {
     recorder.startRecording(screenStream)
     recorderRef.current = recorder
     setIsRecording(true)
-
-    if (saveDuringRecordIntervalMS) {
-      startTimeRef.current = performance.now()
-      downloadInterval.current = setInterval(() => {
-        if (!startTimeRef.current) return
-        save()
-      }, saveDuringRecordIntervalMS)
-    }
   }, [save, saveDuringRecordIntervalMS])
 
   const cleanup = () => {
-    if (downloadInterval.current) {
-      clearInterval(downloadInterval.current)
-    }
     stop()
   }
 

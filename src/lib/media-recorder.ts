@@ -42,7 +42,15 @@ const mimeTypes: MimeType[] = [
   },
 ]
 
-export function createMediaRecorder() {
+/**
+ *
+ * @param timeSlice – The number of milliseconds to record into each Blob.
+ * @param onDataAvailable - Fired after each slice of data is available
+ */
+export function createMediaRecorder(
+  timeSlice = 2000,
+  onDataAvailable: () => void = () => {},
+) {
   // Audio Part
   const sourceNodeMap = new Map<string, MediaStreamAudioSourceNode>()
   let audioContext: AudioContext | null
@@ -149,13 +157,14 @@ export function createMediaRecorder() {
 
     mediaRecorder.addEventListener('stop', handleStop)
     mediaRecorder.addEventListener('dataavailable', handleDataAvailable)
-    mediaRecorder.start(100)
+    mediaRecorder.start(timeSlice)
     isRecording = true
   }
 
   function handleDataAvailable(event: BlobEvent) {
     if (event.data && event.data.size > 0) {
       recordedBlobList.push(event.data)
+      onDataAvailable()
     }
   }
 
@@ -232,7 +241,6 @@ export function createMediaRecorder() {
       console.error('Recording is not in progress')
       return
     }
-
     mediaRecorder?.stop()
   }
 

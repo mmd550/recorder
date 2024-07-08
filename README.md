@@ -9,16 +9,24 @@ This package is implemented to achieve:
 ## Library Core API
 
 ```ts
-export declare function createMediaRecorder(): {
+export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?: () => void): {
     startRecording: (stream?: MediaStream) => Promise<undefined>;
     stopRecording: () => void;
     saveRecording: (fileName?: string) => void;
     deleteAudioTrack: (track: MediaStreamTrack) => void;
     addAudioTrack: (track: MediaStreamTrack) => void;
-};
+  };
 ```
 
 - `createMediaRecorder`: Creates a recorder instance and returns it.
+
+#### Params:
+
+- `timeSlice`: The number of milliseconds to record into each Blob.
+
+- `onDataAvailable`: Fired when next slice of data is available.
+
+#### Returns:
 
 - `startRecording`: Gets an ongoing media stream and starts recording it. If no stream is provided to the function it creates and empty stream.
 
@@ -29,6 +37,8 @@ export declare function createMediaRecorder(): {
 - `deleteAudioTrack`: Disconnects provided audio track from media recorder.
 
 ## Hooks
+
+### useCallRecorder
 
 ```ts
 declare interface Props {
@@ -45,6 +55,8 @@ export declare function useCallRecorder(props?: Props): {
     isRecording: boolean;
 };
 ```
+
+#### Params:
 
 - `saveDuringRecordIntervalMS`: If there is a need to save recorded media periodically (for example to prevent data loss if the process has been killed), you can provide this prop and the recorded media will be saved to user's device every `saveDuringRecordIntervalMS` milliseconds. A postfix will be added to file name which indicates the recording start and end time from start of the record in seconds.(for example `[fileName].0-63.mp4`)
 
