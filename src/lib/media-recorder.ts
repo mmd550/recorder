@@ -1,3 +1,8 @@
+interface MimeType {
+  type: string
+  extension: string
+}
+
 export function createMediaRecorder() {
   // Audio Part
   const sourceNodeMap = new Map<string, MediaStreamAudioSourceNode>()
@@ -10,7 +15,7 @@ export function createMediaRecorder() {
   let recordedBlobList: Blob[]
   let mediaRecorder: MediaRecorder | null
   let isRecording = false
-  let supportedType: string | undefined
+  let supportedMimeType: MimeType | undefined
 
   function addAudioTrack(track: MediaStreamTrack) {
     if (!isRecording) {
@@ -71,31 +76,59 @@ export function createMediaRecorder() {
   }
 
   async function startRecording(stream: MediaStream) {
-    const mimeTypes = [
-      'video/webm; codecs="vp9, opus"',
-      'video/webm; codecs="vp8, opus"',
-      'video/webm; codecs=vp9',
-      'video/webm; codecs=vp8',
-      'video/webm; codecs=daala',
-      'video/webm; codecs=h264',
-      'video/webm;',
-      'video/mpeg',
+    const mimeTypes: MimeType[] = [
+      {
+        type: 'video/mp4',
+        extension: '.mp4',
+      },
+      {
+        type: 'video/mpeg',
+        extension: '.mp4',
+      },
+      {
+        type: 'video/webm; codecs="vp9, opus"',
+        extension: '.webm',
+      },
+      {
+        type: 'video/webm; codecs="vp8, opus"',
+        extension: '.webm',
+      },
+      {
+        type: 'video/webm; codecs=vp9',
+        extension: '.webm',
+      },
+      {
+        type: 'video/webm; codecs=vp8',
+        extension: '.webm',
+      },
+      {
+        type: 'video/webm; codecs=daala',
+        extension: '.webm',
+      },
+      {
+        type: 'video/webm; codecs=h264',
+        extension: '.webm',
+      },
+      {
+        type: 'video/webm;',
+        extension: '.webm',
+      },
     ]
-    supportedType = undefined
+    supportedMimeType = undefined
 
     for (const i in mimeTypes) {
-      if (MediaRecorder.isTypeSupported(mimeTypes[i])) {
-        supportedType = mimeTypes[i]
+      if (MediaRecorder.isTypeSupported(mimeTypes[i].type)) {
+        supportedMimeType = mimeTypes[i]
         break
       }
     }
 
-    if (!supportedType) {
+    if (!supportedMimeType) {
       return Promise.reject('No supported type found for MediaRecorder')
     }
 
     const options = {
-      mimeType: supportedType,
+      mimeType: supportedMimeType.type,
     }
 
     try {
@@ -213,13 +246,15 @@ export function createMediaRecorder() {
       return
     }
 
-    if (!supportedType) {
+    if (!supportedMimeType) {
       console.error('There is no supported type')
       return
     }
 
-    const name = `${fileName}.webm` || 'test.webm'
-    const blob = new Blob(recordedBlobList, { type: supportedType })
+    const name = fileName
+      ? `${fileName}${supportedMimeType.extension}`
+      : `video${supportedMimeType.extension}`
+    const blob = new Blob(recordedBlobList, { type: supportedMimeType.type })
     const url = window.URL.createObjectURL(blob)
 
     const a = document.createElement('a')

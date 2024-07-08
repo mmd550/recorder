@@ -1,6 +1,6 @@
 {
   "name": "@weblite/media-recorder",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "files": [
     "dist"
@@ -24,7 +24,8 @@
     "prepub": "yarn build",
     "prepub:alpha": "yarn build",
     "pub:alpha": "npm publish --tag alpha",
-    "pub": "npm publish --tag latest"
+    "pub": "npm publish --tag latest",
+    "ngrok": "ngrok http http://192.168.1.178:3000 --authtoken=2ZnCjhXVO4bVyi4TYySdtBD6CI6_2woFs5XQi36ifgnLvLdxN"
   },
   "publishConfig": {
     "@weblite:registry": "https://git.weblite.me/api/v4/projects/207/packages/npm/"
@@ -43,6 +44,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "ngrok": "^5.0.0-beta.2",
     "prettier": "^3.3.2",
     "rimraf": "^5.0.8",
     "typescript": "^5.2.2",
