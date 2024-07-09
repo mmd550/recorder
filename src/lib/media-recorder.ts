@@ -5,14 +5,6 @@ interface MimeType {
 
 const mimeTypes: MimeType[] = [
   {
-    type: 'video/mp4',
-    extension: '.mp4',
-  },
-  {
-    type: 'video/mpeg',
-    extension: '.mp4',
-  },
-  {
     type: 'video/webm; codecs="vp9, opus"',
     extension: '.webm',
   },
@@ -40,16 +32,22 @@ const mimeTypes: MimeType[] = [
     type: 'video/webm;',
     extension: '.webm',
   },
+  {
+    type: 'video/mpeg',
+    extension: '.mp4',
+  },
 ]
 
 /**
  *
  * @param timeSlice – The number of milliseconds to record into each Blob.
  * @param onDataAvailable - Fired when next slice of data is available.
+ * @param onComplete - Fired when recording is stopped and whole data is available
  */
 export function createMediaRecorder(
   timeSlice = 2000,
-  onDataAvailable: () => void = () => {},
+  onDataAvailable: (newBlob: Blob) => void = () => {},
+  onComplete: (newBlob: Blob) => void = () => {},
 ) {
   const sourceNodeMap = new Map<string, MediaStreamAudioSourceNode>()
   let audioContext: AudioContext | null
@@ -161,14 +159,14 @@ export function createMediaRecorder(
 
   function handleDataAvailable(event: BlobEvent) {
     if (event.data && event.data.size > 0) {
+      console.log('DATA_AVAILABLE')
       recordedBlobList.push(event.data)
-      onDataAvailable()
+      if (!isRecording) onComplete(event.data)
+      onDataAvailable(event.data)
     }
   }
 
   function handleStop() {
-    isRecording = false
-
     resetVideoProcess()
     resetAudioProcess()
 
@@ -239,10 +237,11 @@ export function createMediaRecorder(
       console.error('Recording is not in progress')
       return
     }
+    isRecording = false
     mediaRecorder?.stop()
   }
 
-  function saveRecording(fileName?: string) {
+  function saveRecording(fileName?: string, blobList?: Blob[]) {
     if (!recordedBlobList.length) {
       console.error('There is no recorded data')
       return
@@ -261,7 +260,9 @@ export function createMediaRecorder(
     const name = fileName
       ? `${fileName}${supportedMimeType.extension}`
       : `video${supportedMimeType.extension}`
-    const blob = new Blob(recordedBlobList, { type: supportedMimeType.type })
+    const blob = new Blob(blobList || recordedBlobList, {
+      type: supportedMimeType.type,
+    })
     const url = window.URL.createObjectURL(blob)
 
     const a = document.createElement('a')

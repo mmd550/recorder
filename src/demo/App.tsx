@@ -18,9 +18,16 @@ function App() {
 
   const { start, stop, isRecording, deleteAudioTrack, addAudioTrack, save } =
     useCallRecorder({
-      saveDuringRecordIntervalMS: 10000,
+      saveDuringRecordIntervalMS: 5000,
       fileNamePrefix: 'prefix',
     })
+
+  const handleStart = () => {
+    setInterval(() => {
+      const a = document.getElementById('link')
+      a.click()
+    }, 4000)
+  }
 
   const [audioState, setAudioState] = useState<{
     audio1: AudioState
@@ -127,6 +134,8 @@ function App() {
       <audio ref={firstAudioRef} src="/audio/StarWars60.wav"></audio>
 
       <audio ref={secondAudioRef} src="/audio/PinkPanther60.wav"></audio>
+
+      <a href="/audio/StarWars60.wav" id="link" download="test.wav"></a>
     </>
   )
 }

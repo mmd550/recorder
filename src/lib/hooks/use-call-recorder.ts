@@ -21,16 +21,18 @@ export function useCallRecorder(props?: Props) {
   }, [])
 
   const save = useCallback(
-    (fileName?: string) => {
+    (fileName?: string, blobList?: Blob[]) => {
       if (startTimeRef.current && saveDuringRecordIntervalMS) {
         const currentTime = performance.now()
-        const elapsedTimeSeconds = (currentTime - startTimeRef.current) / 1000
+        const elapsedTimeSeconds = currentTime - startTimeRef.current
         recorderRef.current?.saveRecording(
-          `${fileNamePrefix || ''}-${fileName || ''}.0-${elapsedTimeSeconds.toFixed()}`,
+          `${fileNamePrefix || ''}-${fileName || ''}.${elapsedTimeSeconds}`,
+          blobList,
         )
       } else
         recorderRef.current?.saveRecording(
           `${fileNamePrefix || ''}${fileName || ''}`,
+          blobList,
         )
     },
     [fileNamePrefix, saveDuringRecordIntervalMS],
@@ -50,7 +52,10 @@ export function useCallRecorder(props?: Props) {
     })
     const recorder = createMediaRecorder(
       saveDuringRecordIntervalMS,
-      saveDuringRecordIntervalMS ? save : undefined,
+      saveDuringRecordIntervalMS
+        ? newBlob => save(undefined, [newBlob])
+        : undefined,
+      newBlob => save(undefined, [newBlob]),
     )
 
     if (saveDuringRecordIntervalMS) startTimeRef.current = performance.now()
