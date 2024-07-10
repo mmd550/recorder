@@ -9,13 +9,13 @@ This package is implemented to achieve:
 ## Library Core API
 
 ```ts
-export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?: () => void): {
-    startRecording: (stream?: MediaStream) => Promise<undefined>;
-    stopRecording: () => void;
-    saveRecording: (fileName?: string) => void;
-    deleteAudioTrack: (track: MediaStreamTrack) => void;
-    addAudioTrack: (track: MediaStreamTrack) => void;
-  };
+export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?: (newBlob: Blob) => void, onComplete?: (newBlob: Blob) => void): {
+  startRecording: (stream?: MediaStream) => Promise<undefined>;
+  stopRecording: () => void;
+  saveRecording: (fileName?: string, blobList?: Blob[]) => Promise<void>;
+  deleteAudioTrack: (track: MediaStreamTrack) => void;
+  addAudioTrack: (track: MediaStreamTrack) => void;
+};
 ```
 
 - `createMediaRecorder`: Creates a recorder instance and returns it.
@@ -25,6 +25,8 @@ export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?
 - `timeSlice`: The number of milliseconds to record into each Blob.
 
 - `onDataAvailable`: Fired when next slice of data is available.
+
+- `onComplete`: Fired as last `onDataAvailable` event, when recording is stopped and whole data is available.
 
 #### Returns:
 
@@ -42,25 +44,28 @@ export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?
 
 ```ts
 declare interface Props {
-    saveDuringRecordIntervalMS?: number;
-    fileNamePrefix?: string;
+  saveDuringRecordIntervalMS?: number;
+  fileNamePrefix?: string;
+  onWholeDataSaved?: () => void;
 }
 
 export declare function useCallRecorder(props?: Props): {
-    start: () => Promise<void>;
-    stop: () => void;
-    save: (fileName?: string) => void;
-    addAudioTrack: (audioTrack: MediaStreamTrack) => void;
-    deleteAudioTrack: (audioTrack: MediaStreamTrack) => void;
-    isRecording: boolean;
+  start: () => Promise<void>;
+  stop: () => void;
+  save: (fileName?: string, blobList?: Blob[]) => Promise<void>;
+  addAudioTrack: (audioTrack: MediaStreamTrack) => void;
+  deleteAudioTrack: (audioTrack: MediaStreamTrack) => void;
+  isRecording: boolean;
 };
 ```
 
 #### Params:
 
-- `saveDuringRecordIntervalMS`: If there is a need to save recorded media periodically (for example to prevent data loss if the process has been killed), you can provide this prop and the recorded media will be saved to user's device every `saveDuringRecordIntervalMS` milliseconds. A postfix will be added to file name which indicates the recording start and end time from start of the record in seconds.(for example `[fileName].0-63.mp4`)
+- `saveDuringRecordIntervalMS`: If there is a need to save recorded media periodically (for example to prevent data loss if the process has been killed), you can provide this prop and the recorded media will be saved to user's device every `saveDuringRecordIntervalMS` milliseconds. A postfix will be added to file name which indicates the recording end time from start of the record in milliseconds.(for example `[fileNamePrefix]-[fileName].8543.webm`)
 
 - `fileNamePrefix`: Will be added before file name for each `save` call.
+
+- `onWholeDataSaved`: Will be called when the last part of the record was saved. (It will only be called if we provide `saveDuringRecordIntervalMS` option) 
 
 ## Important Implementation Details
 

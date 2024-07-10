@@ -5,6 +5,9 @@ interface MimeType {
   extension: string
 }
 
+//  If we use mp4 mimetypes, saving multiple chunks and merging them together won't be possible.
+//  saving mp4 mimetypes is supported in safari but generated file is corrupted.
+
 const mimeTypes: MimeType[] = [
   {
     type: 'video/webm; codecs="vp9, opus"',
@@ -44,7 +47,7 @@ const mimeTypes: MimeType[] = [
  *
  * @param timeSlice – The number of milliseconds to record into each Blob.
  * @param onDataAvailable - Fired when next slice of data is available.
- * @param onComplete - Fired when recording is stopped and whole data is available
+ * @param onComplete - Fired as last 'onDataAvailable' event, when recording is stopped and whole data is available
  */
 export function createMediaRecorder(
   timeSlice = 2000,
@@ -178,9 +181,7 @@ export function createMediaRecorder(
   }
 
   async function createTargetStream(stream?: MediaStream) {
-    stream = stream || new MediaStream()
-
-    if (!(stream instanceof MediaStream)) {
+    if (stream && !(stream instanceof MediaStream)) {
       return Promise.reject(new Error('Invalid arugment'))
     }
 
@@ -191,17 +192,17 @@ export function createMediaRecorder(
       return Promise.reject(error);
     }*/
 
-    const videoTrack = stream.getVideoTracks()[0]
+    const videoTrack = stream?.getVideoTracks()[0]
     const audioTrack = processAudioTrack(stream)
 
     const resultStream = new MediaStream()
-    resultStream.addTrack(videoTrack)
+    videoTrack && resultStream.addTrack(videoTrack)
     resultStream.addTrack(audioTrack)
 
     return Promise.resolve(resultStream)
   }
 
-  function processAudioTrack(stream: MediaStream) {
+  function processAudioTrack(stream?: MediaStream) {
     audioContext = new AudioContext()
     audioDestination = audioContext.createMediaStreamDestination()
 
@@ -209,8 +210,9 @@ export function createMediaRecorder(
     mutedSourceNode = audioContext.createBufferSource()
     mutedSourceNode.connect(audioDestination)
 
+    //  Add stream audio tracks (if exists) to audio context
     stream
-      .getTracks()
+      ?.getTracks()
       .filter(track => {
         return track.kind === 'audio'
       })
