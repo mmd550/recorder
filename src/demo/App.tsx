@@ -19,7 +19,7 @@ function App() {
   const { start, stop, isRecording, deleteAudioTrack, addAudioTrack, save } =
     useCallRecorder({
       saveDuringRecordIntervalMS: 5000,
-      fileNamePrefix: 'prefix',
+      fileNamePrefix: undefined,
       onWholeDataSaved() {
         console.log('WHOLE_DATA_SAVED')
       },

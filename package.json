@@ -18,7 +18,7 @@
     "dev": "vite",
     "prebuild": "rimraf dist/*",
     "build": "tsc -b && vite build",
-    "postbuild": "rimraf dist/vite.svg && rimraf dist/audio",
+    "postbuild": "rimraf dist/favicon.svg && rimraf dist/audio",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "prepub": "yarn build",
