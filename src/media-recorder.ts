@@ -88,9 +88,7 @@ export function createMediaRecorder(
 
     if (track.kind === 'audio') {
       const trackID = track.id
-      if (sourceNodeMap.has(trackID)) {
-        return
-      }
+      if (sourceNodeMap.has(trackID)) return
 
       const audioStream = new MediaStream()
       audioStream.addTrack(track)
@@ -108,7 +106,7 @@ export function createMediaRecorder(
     }
 
     if (!(track instanceof MediaStreamTrack)) {
-      console.error('Invalid arugment')
+      console.error('Invalid argument')
       return
     }
 
@@ -126,6 +124,7 @@ export function createMediaRecorder(
   async function startRecording(stream?: MediaStream) {
     supportedMimeType = undefined
 
+    // TODO[review]: You can move mimeTypes list and this logic (detecting supported mimeType) to utils
     for (const i in mimeTypes) {
       if (MediaRecorder.isTypeSupported(mimeTypes[i].type)) {
         supportedMimeType = mimeTypes[i]
@@ -133,9 +132,8 @@ export function createMediaRecorder(
       }
     }
 
-    if (!supportedMimeType) {
+    if (!supportedMimeType)
       return Promise.reject('No supported type found for MediaRecorder')
-    }
 
     const options = {
       mimeType: supportedMimeType.type,
@@ -165,6 +163,7 @@ export function createMediaRecorder(
   function handleDataAvailable(event: BlobEvent) {
     if (event.data && event.data.size > 0) {
       recordedBlobList.push(event.data)
+
       if (!isRecording) onComplete(event.data)
       else onDataAvailable(event.data)
     }
@@ -199,6 +198,7 @@ export function createMediaRecorder(
     videoTrack && resultStream.addTrack(videoTrack)
     resultStream.addTrack(audioTrack)
 
+    // TODO[review]: No need to return Promise.resolve; Returning resultStream does the job since the function is async.
     return Promise.resolve(resultStream)
   }
 
@@ -213,16 +213,12 @@ export function createMediaRecorder(
     //  Add stream audio tracks (if exists) to audio context
     stream
       ?.getTracks()
-      .filter(track => {
-        return track.kind === 'audio'
-      })
+      .filter(track => track.kind === 'audio')
       .forEach(function (track) {
         if (!audioContext || !audioDestination) return
 
         const trackID = track.id
-        if (sourceNodeMap.has(trackID)) {
-          return
-        }
+        if (sourceNodeMap.has(trackID)) return
 
         const audioStream = new MediaStream()
         audioStream.addTrack(track)
@@ -237,30 +233,37 @@ export function createMediaRecorder(
 
   function stopRecording() {
     if (!isRecording) {
-      console.error('Recording is not in progress')
+      console.error('Unable to stop recording: Recording is not in progress')
       return
     }
+
     isRecording = false
     mediaRecorder?.stop()
   }
 
-  async function saveRecording(fileName = 'untitled', blobList?: Blob[]) {
+  async function saveRecording(
+    fileName = 'untitled_recording',
+    blobList?: Blob[],
+  ) {
     if (!recordedBlobList.length) {
-      console.error('There is no recorded data')
+      console.error('Unable to save recording: There is no recorded data')
       return
     }
 
     if (!supportedMimeType) {
-      console.error('There is no supported type')
+      console.error('Unable to save recording: There is no supported type')
       return
     }
 
-    const name = `${fileName}${supportedMimeType.extension}`
-
+    const fileNameWithExt = `${fileName}${supportedMimeType.extension}`
     try {
-      await saveFile(blobList || recordedBlobList, supportedMimeType.type, name)
+      await saveFile(
+        blobList || recordedBlobList,
+        supportedMimeType.type,
+        fileNameWithExt,
+      )
     } catch (e) {
-      console.error('browser not supported')
+      console.error('Unable to save recording: Browser not supported')
     }
   }
 
@@ -268,9 +271,7 @@ export function createMediaRecorder(
 
   function resetAudioProcess() {
     // reset sequence?
-    sourceNodeMap.forEach(sourceNode => {
-      sourceNode.disconnect()
-    })
+    sourceNodeMap.forEach(sourceNode => sourceNode.disconnect())
     sourceNodeMap.clear()
 
     if (mutedSourceNode) {

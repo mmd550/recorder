@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createMediaRecorder } from '../media-recorder.ts'
-import { nothing } from '../utils/functios.ts'
+import { nothing } from '../utils/functions.ts'
 
 interface Props {
   saveDuringRecordIntervalMS?: number
@@ -22,6 +22,7 @@ export function useCallRecorder(props?: Props) {
   const stop = useCallback(() => {
     const recorder = recorderRef.current
     if (!recorder) return
+
     recorder.stopRecording()
     setIsRecording(false)
   }, [])
@@ -60,9 +61,11 @@ export function useCallRecorder(props?: Props) {
   }, [])
 
   const start = useCallback(async () => {
+    // TODO[review]: Ensure getDisplayMedia is a function. because In phone devices, it's undefined
     const screenStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
     })
+
     const recorder = createMediaRecorder(
       saveDuringRecordIntervalMS,
       saveDuringRecordIntervalMS
@@ -82,6 +85,7 @@ export function useCallRecorder(props?: Props) {
     setIsRecording(true)
   }, [save, saveDuringRecordIntervalMS, onWholeDataSaved])
 
+  // TODO[review]: No need to define another function. Just use stop in useEffect's cleanup function.
   const cleanup = () => {
     stop()
   }
