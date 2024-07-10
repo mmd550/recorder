@@ -61,7 +61,13 @@ export function useCallRecorder(props?: Props) {
   }, [])
 
   const start = useCallback(async () => {
-    // TODO[review]: Ensure getDisplayMedia is a function. because In phone devices, it's undefined
+    if (typeof navigator.mediaDevices?.getDisplayMedia !== 'function')
+      return Promise.reject(
+        new Error(
+          'Could not start recording. Browser does not support getDisplayMedia.',
+        ),
+      )
+
     const screenStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
     })
@@ -85,13 +91,8 @@ export function useCallRecorder(props?: Props) {
     setIsRecording(true)
   }, [save, saveDuringRecordIntervalMS, onWholeDataSaved])
 
-  // TODO[review]: No need to define another function. Just use stop in useEffect's cleanup function.
-  const cleanup = () => {
-    stop()
-  }
-
   useEffect(
-    () => cleanup,
+    () => stop,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )

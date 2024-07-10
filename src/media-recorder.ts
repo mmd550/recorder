@@ -1,47 +1,5 @@
 import { saveFile } from './utils/blob.ts'
-
-interface MimeType {
-  type: string
-  extension: string
-}
-
-//  If we use mp4 mimetypes, saving multiple chunks and merging them together won't be possible.
-//  saving mp4 mimetypes is supported in safari but generated file is corrupted.
-
-const mimeTypes: MimeType[] = [
-  {
-    type: 'video/webm; codecs="vp9, opus"',
-    extension: '.webm',
-  },
-  {
-    type: 'video/webm; codecs="vp8, opus"',
-    extension: '.webm',
-  },
-  {
-    type: 'video/webm; codecs=vp9',
-    extension: '.webm',
-  },
-  {
-    type: 'video/webm; codecs=vp8',
-    extension: '.webm',
-  },
-  {
-    type: 'video/webm; codecs=daala',
-    extension: '.webm',
-  },
-  {
-    type: 'video/webm; codecs=h264',
-    extension: '.webm',
-  },
-  {
-    type: 'video/webm;',
-    extension: '.webm',
-  },
-  {
-    type: 'video/mpeg',
-    extension: '.mp4',
-  },
-]
+import { getSupportedMimeType, MimeType } from './utils/supported-mime-type.ts'
 
 /**
  *
@@ -124,13 +82,7 @@ export function createMediaRecorder(
   async function startRecording(stream?: MediaStream) {
     supportedMimeType = undefined
 
-    // TODO[review]: You can move mimeTypes list and this logic (detecting supported mimeType) to utils
-    for (const i in mimeTypes) {
-      if (MediaRecorder.isTypeSupported(mimeTypes[i].type)) {
-        supportedMimeType = mimeTypes[i]
-        break
-      }
-    }
+    supportedMimeType = getSupportedMimeType()
 
     if (!supportedMimeType)
       return Promise.reject('No supported type found for MediaRecorder')
@@ -198,8 +150,7 @@ export function createMediaRecorder(
     videoTrack && resultStream.addTrack(videoTrack)
     resultStream.addTrack(audioTrack)
 
-    // TODO[review]: No need to return Promise.resolve; Returning resultStream does the job since the function is async.
-    return Promise.resolve(resultStream)
+    return resultStream
   }
 
   function processAudioTrack(stream?: MediaStream) {
@@ -262,8 +213,9 @@ export function createMediaRecorder(
         supportedMimeType.type,
         fileNameWithExt,
       )
-    } catch (e) {
-      console.error('Unable to save recording: Browser not supported')
+    } catch (e: unknown) {
+      if (e instanceof Error) console.error(e.message)
+      else console.error('Unable to save recording.')
     }
   }
 
