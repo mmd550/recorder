@@ -1,3 +1,5 @@
+import { saveFile } from './utils/blob.ts'
+
 interface MimeType {
   type: string
   extension: string
@@ -159,10 +161,9 @@ export function createMediaRecorder(
 
   function handleDataAvailable(event: BlobEvent) {
     if (event.data && event.data.size > 0) {
-      console.log('DATA_AVAILABLE')
       recordedBlobList.push(event.data)
       if (!isRecording) onComplete(event.data)
-      onDataAvailable(event.data)
+      else onDataAvailable(event.data)
     }
   }
 
@@ -241,14 +242,9 @@ export function createMediaRecorder(
     mediaRecorder?.stop()
   }
 
-  function saveRecording(fileName?: string, blobList?: Blob[]) {
+  async function saveRecording(fileName = 'untitled', blobList?: Blob[]) {
     if (!recordedBlobList.length) {
       console.error('There is no recorded data')
-      return
-    }
-
-    if (!('URL' in window)) {
-      console.error('browser not supported')
       return
     }
 
@@ -257,26 +253,13 @@ export function createMediaRecorder(
       return
     }
 
-    const name = fileName
-      ? `${fileName}${supportedMimeType.extension}`
-      : `video${supportedMimeType.extension}`
-    const blob = new Blob(blobList || recordedBlobList, {
-      type: supportedMimeType.type,
-    })
-    const url = window.URL.createObjectURL(blob)
+    const name = `${fileName}${supportedMimeType.extension}`
 
-    const a = document.createElement('a')
-    a.style.display = 'none'
-    a.href = url
-    a.download = name
-    document.body.appendChild(a)
-    a.click()
-    setTimeout(() => {
-      if ('URL' in window) {
-        window.URL.revokeObjectURL(url)
-      }
-      document.body.removeChild(a)
-    }, 100)
+    try {
+      await saveFile(blobList || recordedBlobList, supportedMimeType.type, name)
+    } catch (e) {
+      console.error('browser not supported')
+    }
   }
 
   function resetVideoProcess() {}
@@ -299,8 +282,9 @@ export function createMediaRecorder(
     }
 
     if (audioContext) {
-      audioContext.close()
-      audioContext = null
+      audioContext.close().then(() => {
+        audioContext = null
+      })
     }
   }
 

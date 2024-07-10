@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createMediaRecorder } from '../media-recorder.ts'
+import { nothing } from '../utils/functios.ts'
 
 interface Props {
   saveDuringRecordIntervalMS?: number
   fileNamePrefix?: string
+  onWholeDataSaved?: () => void
 }
 
 export function useCallRecorder(props?: Props) {
-  const { saveDuringRecordIntervalMS, fileNamePrefix } = props || {}
+  const {
+    saveDuringRecordIntervalMS,
+    fileNamePrefix,
+    onWholeDataSaved = nothing,
+  } = props || {}
 
   const recorderRef = useRef<ReturnType<typeof createMediaRecorder>>()
   const [isRecording, setIsRecording] = useState(false)
@@ -21,17 +27,24 @@ export function useCallRecorder(props?: Props) {
   }, [])
 
   const save = useCallback(
-    (fileName?: string, blobList?: Blob[]) => {
+    async (fileName?: string, blobList?: Blob[]) => {
+      const separator =
+        fileName && fileNamePrefix
+          ? '-'
+          : !fileName && !fileNamePrefix
+            ? 'untitled'
+            : ''
+
       if (startTimeRef.current && saveDuringRecordIntervalMS) {
         const currentTime = performance.now()
-        const elapsedTimeSeconds = currentTime - startTimeRef.current
-        recorderRef.current?.saveRecording(
-          `${fileNamePrefix || ''}-${fileName || ''}.${elapsedTimeSeconds}`,
+        const elapsedTimeMilliSeconds = currentTime - startTimeRef.current
+        await recorderRef.current?.saveRecording(
+          `${fileNamePrefix || ''}${separator}${fileName || ''}.${elapsedTimeMilliSeconds.toFixed(2)}`,
           blobList,
         )
       } else
-        recorderRef.current?.saveRecording(
-          `${fileNamePrefix || ''}${fileName || ''}`,
+        await recorderRef.current?.saveRecording(
+          `${fileNamePrefix || ''}${separator}${fileName || ''}`,
           blobList,
         )
     },
@@ -55,14 +68,19 @@ export function useCallRecorder(props?: Props) {
       saveDuringRecordIntervalMS
         ? newBlob => save(undefined, [newBlob])
         : undefined,
-      newBlob => save(undefined, [newBlob]),
+      saveDuringRecordIntervalMS
+        ? async newBlob => {
+            await save(undefined, [newBlob])
+            onWholeDataSaved()
+          }
+        : undefined,
     )
 
     if (saveDuringRecordIntervalMS) startTimeRef.current = performance.now()
-    recorder.startRecording(screenStream)
+    await recorder.startRecording(screenStream)
     recorderRef.current = recorder
     setIsRecording(true)
-  }, [save, saveDuringRecordIntervalMS])
+  }, [save, saveDuringRecordIntervalMS, onWholeDataSaved])
 
   const cleanup = () => {
     stop()

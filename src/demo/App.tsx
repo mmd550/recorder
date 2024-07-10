@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import './App.css'
-import { useCallRecorder } from '../lib/hooks/use-call-recorder.ts'
+import { useCallRecorder } from '../hooks/use-call-recorder.ts'
 
 let firstAudioStream: MediaStream | null
 let secondAudioStream: MediaStream | null
@@ -20,14 +20,10 @@ function App() {
     useCallRecorder({
       saveDuringRecordIntervalMS: 5000,
       fileNamePrefix: 'prefix',
+      onWholeDataSaved() {
+        console.log('WHOLE_DATA_SAVED')
+      },
     })
-
-  const handleStart = () => {
-    setInterval(() => {
-      const a = document.getElementById('link')
-      a.click()
-    }, 4000)
-  }
 
   const [audioState, setAudioState] = useState<{
     audio1: AudioState
