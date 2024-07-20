@@ -207,6 +207,7 @@ export function createMediaRecorder(
     }
 
     const fileNameWithExt = `${fileName}${supportedMimeType.extension}`
+    console.log('saving chunk: ', fileNameWithExt)
     try {
       await saveFile(
         blobList || recordedBlobList,
