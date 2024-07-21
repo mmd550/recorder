@@ -11,6 +11,7 @@ export function createMediaRecorder(
   timeSlice = 2000,
   onDataAvailable: (newBlob: Blob) => void = () => {},
   onComplete: (newBlob: Blob) => void = () => {},
+  saveBlobs = true,
 ) {
   const sourceNodeMap = new Map<string, MediaStreamAudioSourceNode>()
   let audioContext: AudioContext | null
@@ -114,8 +115,8 @@ export function createMediaRecorder(
 
   function handleDataAvailable(event: BlobEvent) {
     if (event.data && event.data.size > 0) {
-      recordedBlobList.push(event.data)
-
+      if (saveBlobs) recordedBlobList.push(event.data)
+        
       if (!isRecording) onComplete(event.data)
       else onDataAvailable(event.data)
     }

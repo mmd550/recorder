@@ -83,6 +83,7 @@ export function useCallRecorder(props?: Props) {
             onWholeDataSaved()
           }
         : undefined,
+      !saveDuringRecordIntervalMS,
     )
 
     if (saveDuringRecordIntervalMS) startTimeRef.current = performance.now()
