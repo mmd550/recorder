@@ -61,6 +61,7 @@ export function useCallRecorder(props?: Props) {
   }, [])
 
   const start = useCallback(async () => {
+    if (isRecording) return
     if (typeof navigator.mediaDevices?.getDisplayMedia !== 'function')
       return Promise.reject(
         new Error(
@@ -90,7 +91,7 @@ export function useCallRecorder(props?: Props) {
     await recorder.startRecording(screenStream)
     recorderRef.current = recorder
     setIsRecording(true)
-  }, [save, saveDuringRecordIntervalMS, onWholeDataSaved])
+  }, [save, saveDuringRecordIntervalMS, onWholeDataSaved, isRecording])
 
   useEffect(
     () => stop,

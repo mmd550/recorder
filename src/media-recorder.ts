@@ -116,7 +116,7 @@ export function createMediaRecorder(
   function handleDataAvailable(event: BlobEvent) {
     if (event.data && event.data.size > 0) {
       if (saveBlobs) recordedBlobList.push(event.data)
-        
+
       if (!isRecording) onComplete(event.data)
       else onDataAvailable(event.data)
     }
@@ -197,7 +197,7 @@ export function createMediaRecorder(
     fileName = 'untitled_recording',
     blobList?: Blob[],
   ) {
-    if (!recordedBlobList.length) {
+    if (!recordedBlobList.length && !blobList?.length) {
       console.error('Unable to save recording: There is no recorded data')
       return
     }
