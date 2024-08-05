@@ -9,12 +9,14 @@ This package is implemented to achieve:
 ## Library Core API
 
 ```ts
-export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?: (newBlob: Blob) => void, onComplete?: (newBlob: Blob) => void): {
-  startRecording: (stream?: MediaStream) => Promise<undefined>;
-  stopRecording: () => void;
-  saveRecording: (fileName?: string, blobList?: Blob[]) => Promise<void>;
-  deleteAudioTrack: (track: MediaStreamTrack) => void;
-  addAudioTrack: (track: MediaStreamTrack) => void;
+export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?: (newBlob: Blob) => void, onComplete?: (newBlob: Blob) => void, saveBlobs?: boolean): {
+    startRecording: (stream?: MediaStream) => Promise<undefined>;
+    stopRecording: () => void;
+    saveRecording: (fileName?: string, blobList?: Blob[]) => Promise<void>;
+    deleteAudioTrack: (track: MediaStreamTrack) => void;
+    addAudioTrack: (track: MediaStreamTrack) => void;
+    pauseRecording: () => void;
+    resumeRecording: () => void;
 };
 ```
 
@@ -32,6 +34,10 @@ export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?
 
 - `startRecording`: Gets an ongoing media stream and starts recording it. If no stream is provided to the function it creates and empty stream.
 
+- `stopRecording`: Stops the recording, resets the recorder and stops all audio tracks.
+
+- `pauseRecording | resumeRecording`: Pause and resume recording.
+
 - `saveRecording`: Saves the recorded media in device. You can call this function during recording and it saves the recorded media until now.
 
 - `addAudioTrack`: Gets an audio track and connects it to media recorder.
@@ -43,19 +49,22 @@ export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?
 ### useCallRecorder
 
 ```ts
-declare interface Props {
-  saveDuringRecordIntervalMS?: number;
-  fileNamePrefix?: string;
-  onWholeDataSaved?: () => void;
+declare interface Options {
+    saveDuringRecordIntervalMS?: number;
+    fileNamePrefix?: string;
+    onWholeDataSaved?: () => void;
 }
 
-export declare function useCallRecorder(props?: Props): {
-  start: () => Promise<void>;
-  stop: () => void;
-  save: (fileName?: string, blobList?: Blob[]) => Promise<void>;
-  addAudioTrack: (audioTrack: MediaStreamTrack) => void;
-  deleteAudioTrack: (audioTrack: MediaStreamTrack) => void;
-  isRecording: boolean;
+export declare function useCallRecorder(options?: Options): {
+    start: () => Promise<undefined>;
+    stop: () => void;
+    save: (fileName?: string, blobList?: Blob[]) => Promise<void>;
+    addAudioTrack: (audioTrack: MediaStreamTrack) => void;
+    deleteAudioTrack: (audioTrack: MediaStreamTrack) => void;
+    isRecording: boolean;
+    recordingState: RecordingState;
+    pause: () => void;
+    resume: () => void;
 };
 ```
 

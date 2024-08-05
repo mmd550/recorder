@@ -2,18 +2,18 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createMediaRecorder } from '../media-recorder.ts'
 import { nothing } from '../utils/functions.ts'
 
-interface Props {
+interface Options {
   saveDuringRecordIntervalMS?: number
   fileNamePrefix?: string
   onWholeDataSaved?: () => void
 }
 
-export function useCallRecorder(props?: Props) {
+export function useCallRecorder(options?: Options) {
   const {
     saveDuringRecordIntervalMS,
     fileNamePrefix,
     onWholeDataSaved = nothing,
-  } = props || {}
+  } = options || {}
 
   const recorderRef = useRef<ReturnType<typeof createMediaRecorder>>()
   const [recordingState, setRecordingState] =
@@ -116,7 +116,7 @@ export function useCallRecorder(props?: Props) {
     save,
     addAudioTrack,
     deleteAudioTrack,
-    isRecording: recordingState !== 'paused',
+    isRecording: recordingState !== 'inactive',
     recordingState,
     pause,
     resume,
