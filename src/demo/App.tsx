@@ -16,14 +16,22 @@ function App() {
   const firstAudioRef = useRef<HTMLAudioElement>(null)
   const secondAudioRef = useRef<HTMLAudioElement>(null)
 
-  const { start, stop, isRecording, deleteAudioTrack, addAudioTrack, save } =
-    useCallRecorder({
-      saveDuringRecordIntervalMS: 5000,
-      fileNamePrefix: undefined,
-      onWholeDataSaved() {
-        console.log('WHOLE_DATA_SAVED')
-      },
-    })
+  const {
+    start,
+    stop,
+    isRecording,
+    deleteAudioTrack,
+    addAudioTrack,
+    save,
+    pause,
+    resume,
+  } = useCallRecorder({
+    saveDuringRecordIntervalMS: 5000,
+    fileNamePrefix: undefined,
+    onWholeDataSaved() {
+      console.log('WHOLE_DATA_SAVED')
+    },
+  })
 
   const [audioState, setAudioState] = useState<{
     audio1: AudioState
@@ -126,6 +134,8 @@ function App() {
       </button>
       <button onClick={stopRecording}>Stop Recording</button>
       <button onClick={() => save()}>Download Recording</button>
+      <button onClick={pause}>Pause Recording</button>
+      <button onClick={resume}>Resume Recording</button>
 
       <audio ref={firstAudioRef} src="/audio/StarWars60.wav"></audio>
 

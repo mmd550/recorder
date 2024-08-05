@@ -183,6 +183,26 @@ export function createMediaRecorder(
     return audioDestination.stream.getAudioTracks()[0]
   }
 
+  function pauseRecording() {
+    if (mediaRecorder?.state === 'paused') {
+      console.error('Unable to pause recording: Recording is already paused')
+      return
+    }
+
+    mediaRecorder?.pause()
+  }
+
+  function resumeRecording() {
+    if (mediaRecorder?.state !== 'paused') {
+      console.error(
+        'Unable to resume recording: Recording is already in progress',
+      )
+      return
+    }
+
+    mediaRecorder?.resume()
+  }
+
   function stopRecording() {
     if (!isRecording) {
       console.error('Unable to stop recording: Recording is not in progress')
@@ -251,5 +271,7 @@ export function createMediaRecorder(
     saveRecording,
     deleteAudioTrack,
     addAudioTrack,
+    pauseRecording,
+    resumeRecording,
   }
 }

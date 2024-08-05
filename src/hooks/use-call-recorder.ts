@@ -16,7 +16,8 @@ export function useCallRecorder(props?: Props) {
   } = props || {}
 
   const recorderRef = useRef<ReturnType<typeof createMediaRecorder>>()
-  const [isRecording, setIsRecording] = useState(false)
+  const [recordingState, setRecordingState] =
+    useState<RecordingState>('inactive')
   const startTimeRef = useRef<number>()
 
   const stop = useCallback(() => {
@@ -24,7 +25,7 @@ export function useCallRecorder(props?: Props) {
     if (!recorder) return
 
     recorder.stopRecording()
-    setIsRecording(false)
+    setRecordingState('inactive')
   }, [])
 
   const save = useCallback(
@@ -61,7 +62,7 @@ export function useCallRecorder(props?: Props) {
   }, [])
 
   const start = useCallback(async () => {
-    if (isRecording) return
+    if (recordingState === 'recording') return
     if (typeof navigator.mediaDevices?.getDisplayMedia !== 'function')
       return Promise.reject(
         new Error(
@@ -90,8 +91,18 @@ export function useCallRecorder(props?: Props) {
     if (saveDuringRecordIntervalMS) startTimeRef.current = performance.now()
     await recorder.startRecording(screenStream)
     recorderRef.current = recorder
-    setIsRecording(true)
-  }, [save, saveDuringRecordIntervalMS, onWholeDataSaved, isRecording])
+    setRecordingState('recording')
+  }, [save, saveDuringRecordIntervalMS, onWholeDataSaved, recordingState])
+
+  const pause = useCallback(() => {
+    recorderRef.current?.pauseRecording()
+    setRecordingState('paused')
+  }, [])
+
+  const resume = useCallback(() => {
+    recorderRef.current?.resumeRecording()
+    setRecordingState('recording')
+  }, [])
 
   useEffect(
     () => stop,
@@ -105,6 +116,9 @@ export function useCallRecorder(props?: Props) {
     save,
     addAudioTrack,
     deleteAudioTrack,
-    isRecording,
+    isRecording: recordingState !== 'paused',
+    recordingState,
+    pause,
+    resume,
   }
 }
