@@ -20,7 +20,8 @@ interface Options {
    * @default
    *  {
    *    frameRate: {
-   *      max: 15
+   *      min: 25,
+   *      max: 30
    *    }
    *  }
    */
@@ -33,7 +34,7 @@ export function useCallRecorder(options?: Options) {
     fileNamePrefix,
     onWholeDataSaved = nothing,
     videoTrackConstraints = {
-      frameRate: { max: 15 },
+      frameRate: { min: 25, max: 30 },
     },
   } = options || {}
 

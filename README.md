@@ -9,15 +9,20 @@ This package is implemented to achieve:
 ## Library Core API
 
 ```ts
-export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?: (newBlob: Blob) => void, onComplete?: (newBlob: Blob) => void, saveBlobs?: boolean): {
-    startRecording: (stream?: MediaStream) => Promise<undefined>;
-    stopRecording: () => void;
-    saveRecording: (fileName?: string, blobList?: Blob[]) => Promise<void>;
-    deleteAudioTrack: (track: MediaStreamTrack) => void;
-    addAudioTrack: (track: MediaStreamTrack) => void;
-    pauseRecording: () => void;
-    resumeRecording: () => void;
-};
+export declare function createMediaRecorder(
+  timeSlice?: number,
+  onDataAvailable?: (newBlob: Blob) => void,
+  onComplete?: (newBlob: Blob) => void,
+  saveBlobs?: boolean,
+): {
+  startRecording: (stream?: MediaStream) => Promise<undefined>
+  stopRecording: () => void
+  saveRecording: (fileName?: string, blobList?: Blob[]) => Promise<void>
+  deleteAudioTrack: (track: MediaStreamTrack) => void
+  addAudioTrack: (track: MediaStreamTrack) => void
+  pauseRecording: () => void
+  resumeRecording: () => void
+}
 ```
 
 - `createMediaRecorder`: Creates a recorder instance and returns it.
@@ -50,23 +55,23 @@ export declare function createMediaRecorder(timeSlice?: number, onDataAvailable?
 
 ```ts
 declare interface Options {
-    saveDuringRecordIntervalMS?: number;
-    fileNamePrefix?: string;
-    onWholeDataSaved?: () => void;
-    videoTrackConstraints?: MediaTrackConstraints
+  saveDuringRecordIntervalMS?: number
+  fileNamePrefix?: string
+  onWholeDataSaved?: () => void
+  videoTrackConstraints?: MediaTrackConstraints
 }
 
 export declare function useCallRecorder(options?: Options): {
-    start: () => Promise<undefined>;
-    stop: () => void;
-    save: (fileName?: string, blobList?: Blob[]) => Promise<void>;
-    addAudioTrack: (audioTrack: MediaStreamTrack) => void;
-    deleteAudioTrack: (audioTrack: MediaStreamTrack) => void;
-    isRecording: boolean;
-    recordingState: RecordingState;
-    pause: () => void;
-    resume: () => void;
-};
+  start: () => Promise<undefined>
+  stop: () => void
+  save: (fileName?: string, blobList?: Blob[]) => Promise<void>
+  addAudioTrack: (audioTrack: MediaStreamTrack) => void
+  deleteAudioTrack: (audioTrack: MediaStreamTrack) => void
+  isRecording: boolean
+  recordingState: RecordingState
+  pause: () => void
+  resume: () => void
+}
 ```
 
 #### Params:
@@ -77,17 +82,18 @@ export declare function useCallRecorder(options?: Options): {
 
 - `onWholeDataSaved`: Will be called when the last part of the record was saved. (It will only be called if we provide `saveDuringRecordIntervalMS` option)
 
-- `videoTrackConstraints`: A dictionary that is used to describe a set of capabilities and the value or values each can take on. 
-default value:
+- `videoTrackConstraints`: A dictionary that is used to describe a set of capabilities and the value or values each can take on.
+  default value:
+
 ```ts
     {
       frameRate:
         {
-            max: 15
+            min: 25,
+            max: 30
         }
     }
 ```
-
 
 ## Important Implementation Details
 
