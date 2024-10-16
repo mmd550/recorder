@@ -31,6 +31,7 @@ function App() {
     onWholeDataSaved() {
       console.log('WHOLE_DATA_SAVED')
     },
+    videoTrackConstraints: {},
   })
 
   const [audioState, setAudioState] = useState<{

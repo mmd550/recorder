@@ -3,9 +3,28 @@ import { createMediaRecorder } from '../media-recorder.ts'
 import { nothing } from '../utils/functions.ts'
 
 interface Options {
+  /**
+   * If there is a need to save recorded media periodically (for example to prevent data loss if the process has been killed), you can provide this prop and the recorded media will be saved to user's device every `saveDuringRecordIntervalMS` milliseconds. A postfix will be added to file name which indicates the recording end time from start of the record in milliseconds.(for example `[fileNamePrefix]-[fileName].8543.webm`)
+   */
   saveDuringRecordIntervalMS?: number
+  /**
+   * Will be added before file name for each `save` call
+   */
   fileNamePrefix?: string
+  /**
+   * Will be called when the last part of the record was saved. (It will only be called if we provide `saveDuringRecordIntervalMS` option)
+   */
   onWholeDataSaved?: () => void
+  /**
+   * A dictionary that is used to describe a set of capabilities and the value or values each can take on.
+   * @default
+   *  {
+   *    frameRate: {
+   *      max: 15
+   *    }
+   *  }
+   */
+  videoTrackConstraints?: MediaTrackConstraints
 }
 
 export function useCallRecorder(options?: Options) {
@@ -13,6 +32,9 @@ export function useCallRecorder(options?: Options) {
     saveDuringRecordIntervalMS,
     fileNamePrefix,
     onWholeDataSaved = nothing,
+    videoTrackConstraints = {
+      frameRate: { max: 15 },
+    },
   } = options || {}
 
   const recorderRef = useRef<ReturnType<typeof createMediaRecorder>>()
@@ -62,6 +84,15 @@ export function useCallRecorder(options?: Options) {
   }, [])
 
   const start = useCallback(async () => {
+    const supportedConstraints =
+      navigator.mediaDevices.getSupportedConstraints()
+    const passedConstraints = videoTrackConstraints
+
+    console.log(
+      'Starting Record',
+      JSON.stringify({ passedConstraints, supportedConstraints }),
+    )
+
     if (recordingState === 'recording') return
     if (typeof navigator.mediaDevices?.getDisplayMedia !== 'function')
       return Promise.reject(
@@ -86,13 +117,20 @@ export function useCallRecorder(options?: Options) {
           }
         : undefined,
       !saveDuringRecordIntervalMS,
+      videoTrackConstraints,
     )
 
     if (saveDuringRecordIntervalMS) startTimeRef.current = performance.now()
     await recorder.startRecording(screenStream)
     recorderRef.current = recorder
     setRecordingState('recording')
-  }, [save, saveDuringRecordIntervalMS, onWholeDataSaved, recordingState])
+  }, [
+    save,
+    saveDuringRecordIntervalMS,
+    onWholeDataSaved,
+    recordingState,
+    videoTrackConstraints,
+  ])
 
   const pause = useCallback(() => {
     recorderRef.current?.pauseRecording()
@@ -112,6 +150,9 @@ export function useCallRecorder(options?: Options) {
 
   return {
     start,
+    /**
+     * Stops the recording. If `saveDuringRecordIntervalMS` option is provided, after calling stop, the last chunk will be saved and then the `onWholeDataSaved` callback will be called to make sure the whole data has been saved before terminating the process.
+     */
     stop,
     save,
     addAudioTrack,

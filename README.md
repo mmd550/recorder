@@ -53,6 +53,7 @@ declare interface Options {
     saveDuringRecordIntervalMS?: number;
     fileNamePrefix?: string;
     onWholeDataSaved?: () => void;
+    videoTrackConstraints?: MediaTrackConstraints
 }
 
 export declare function useCallRecorder(options?: Options): {
@@ -74,7 +75,19 @@ export declare function useCallRecorder(options?: Options): {
 
 - `fileNamePrefix`: Will be added before file name for each `save` call.
 
-- `onWholeDataSaved`: Will be called when the last part of the record was saved. (It will only be called if we provide `saveDuringRecordIntervalMS` option) 
+- `onWholeDataSaved`: Will be called when the last part of the record was saved. (It will only be called if we provide `saveDuringRecordIntervalMS` option)
+
+- `videoTrackConstraints`: A dictionary that is used to describe a set of capabilities and the value or values each can take on. 
+default value:
+```ts
+    {
+      frameRate:
+        {
+            max: 15
+        }
+    }
+```
+
 
 ## Important Implementation Details
 

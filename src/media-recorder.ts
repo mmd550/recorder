@@ -12,6 +12,10 @@ export function createMediaRecorder(
   onDataAvailable: (newBlob: Blob) => void = () => {},
   onComplete: (newBlob: Blob) => void = () => {},
   saveBlobs = true,
+  /**
+   * A dictionary that is used to describe a set of capabilities and the value or values each can take on.
+   */
+  videoTrackConstraints?: MediaTrackConstraints,
 ) {
   const sourceNodeMap = new Map<string, MediaStreamAudioSourceNode>()
   let audioContext: AudioContext | null
@@ -146,6 +150,8 @@ export function createMediaRecorder(
 
     const videoTrack = stream?.getVideoTracks()[0]
     const audioTrack = processAudioTrack(stream)
+
+    videoTrack?.applyConstraints(videoTrackConstraints)
 
     const resultStream = new MediaStream()
     videoTrack && resultStream.addTrack(videoTrack)
