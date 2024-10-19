@@ -20,8 +20,7 @@ interface Options {
    * @default
    *  {
    *    frameRate: {
-   *      min: 25,
-   *      max: 30
+   *      exact: 25,
    *    }
    *  }
    */
@@ -34,7 +33,7 @@ export function useCallRecorder(options?: Options) {
     fileNamePrefix,
     onWholeDataSaved = nothing,
     videoTrackConstraints = {
-      frameRate: { min: 25, max: 30 },
+      frameRate: { exact: 25 },
     },
   } = options || {}
 
@@ -47,6 +46,7 @@ export function useCallRecorder(options?: Options) {
     const recorder = recorderRef.current
     if (!recorder) return
 
+    console.log('[Recorder] Received stop command. stopping recorder...')
     recorder.stopRecording()
     setRecordingState('inactive')
   }, [])
@@ -90,7 +90,7 @@ export function useCallRecorder(options?: Options) {
     const passedConstraints = videoTrackConstraints
 
     console.log(
-      'Starting Record',
+      '[Recorder] Starting Record',
       JSON.stringify({ passedConstraints, supportedConstraints }),
     )
 
@@ -114,6 +114,7 @@ export function useCallRecorder(options?: Options) {
       saveDuringRecordIntervalMS
         ? async newBlob => {
             await save(undefined, [newBlob])
+            console.log("[Recorder] Whole data saved.")
             onWholeDataSaved()
           }
         : undefined,

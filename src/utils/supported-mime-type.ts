@@ -61,7 +61,7 @@ const mimeTypes: MimeType[] = [
 export function getSupportedMimeType() {
   for (const i in mimeTypes) {
     if (MediaRecorder.isTypeSupported(mimeTypes[i].type)) {
-      console.log('Supported MimeType', mimeTypes[i].type)
+      console.log('[Recorder] Supported MimeType', mimeTypes[i].type)
       return mimeTypes[i]
     }
   }

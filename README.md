@@ -89,8 +89,7 @@ export declare function useCallRecorder(options?: Options): {
     {
       frameRate:
         {
-            min: 25,
-            max: 30
+            exact: 25,
         }
     }
 ```
