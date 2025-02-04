@@ -18,11 +18,7 @@ interface Options {
   /**
    * A dictionary that is used to describe a set of capabilities and the value or values each can take on.
    * @default
-   *  {
-   *    frameRate: {
-   *      exact: 25,
-   *    }
-   *  }
+   *  undefined
    */
   videoTrackConstraints?: MediaTrackConstraints
 }
@@ -32,9 +28,7 @@ export function useCallRecorder(options?: Options) {
     saveDuringRecordIntervalMS,
     fileNamePrefix,
     onWholeDataSaved = nothing,
-    videoTrackConstraints = {
-      frameRate: { exact: 25 },
-    },
+    videoTrackConstraints,
   } = options || {}
 
   const recorderRef = useRef<ReturnType<typeof createMediaRecorder>>()
@@ -114,7 +108,7 @@ export function useCallRecorder(options?: Options) {
       saveDuringRecordIntervalMS
         ? async newBlob => {
             await save(undefined, [newBlob])
-            console.log("[Recorder] Whole data saved.")
+            console.log('[Recorder] Whole data saved.')
             onWholeDataSaved()
           }
         : undefined,

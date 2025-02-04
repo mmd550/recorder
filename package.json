@@ -1,6 +1,6 @@
 {
   "name": "@weblite/media-recorder",
-  "version": "0.0.93",
+  "version": "0.0.93-beta.1",
   "type": "module",
   "files": [
     "dist"
