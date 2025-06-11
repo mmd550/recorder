@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createMediaRecorder } from '../media-recorder.ts'
 import { nothing } from '../utils/functions.ts'
+import { logger } from '../utils/logger.ts'
+import { enhanceErrorReporting } from '../utils/enhance-error-reporting.ts'
 
 interface Options {
   /**
@@ -46,7 +48,7 @@ export function useCallRecorder(options?: Options) {
     const recorder = recorderRef.current
     if (!recorder) return
 
-    console.log('[Recorder] Received stop command. stopping recorder...')
+    logger.log('[Recorder] Received stop command. stopping recorder...')
     recorder.stopRecording()
     setRecordingState('inactive')
   }, [])
@@ -84,15 +86,18 @@ export function useCallRecorder(options?: Options) {
     recorderRef.current?.deleteAudioTrack(audioTrack)
   }, [])
 
+  useEffect(() => {
+    enhanceErrorReporting()
+  }, [])
   const start = useCallback(async () => {
     const supportedConstraints =
       navigator.mediaDevices.getSupportedConstraints()
     const passedConstraints = videoTrackConstraints
 
-    console.log(
-      '[Recorder] Starting Record',
-      JSON.stringify({ passedConstraints, supportedConstraints }),
-    )
+    logger.log('[Recorder] Starting Record', {
+      passedConstraints,
+      supportedConstraints,
+    })
 
     if (recordingState === 'recording') return
     if (typeof navigator.mediaDevices?.getDisplayMedia !== 'function')
@@ -114,7 +119,7 @@ export function useCallRecorder(options?: Options) {
       saveDuringRecordIntervalMS
         ? async newBlob => {
             await save(undefined, [newBlob])
-            console.log("[Recorder] Whole data saved.")
+            logger.log('[Recorder] Whole data saved.')
             onWholeDataSaved()
           }
         : undefined,
