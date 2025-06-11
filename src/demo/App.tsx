@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import './App.css'
 import { useCallRecorder } from '../hooks/use-call-recorder.ts'
+import { logger } from '../utils/logger.ts'
 
 let firstAudioStream: MediaStream | null
 let secondAudioStream: MediaStream | null
@@ -29,7 +30,7 @@ function App() {
     saveDuringRecordIntervalMS: 5000,
     fileNamePrefix: undefined,
     onWholeDataSaved() {
-      console.log('WHOLE_DATA_SAVED')
+      logger.log('WHOLE_DATA_SAVED')
     },
     videoTrackConstraints: {},
   })

@@ -1,4 +1,5 @@
 import { saveFile } from './utils/blob.ts'
+import { logger } from './utils/logger.ts'
 import { getSupportedMimeType, MimeType } from './utils/supported-mime-type.ts'
 
 /**
@@ -30,22 +31,22 @@ export function createMediaRecorder(
 
   function addAudioTrack(track: MediaStreamTrack) {
     if (!isRecording) {
-      console.error('Recording is not in progress')
+      logger.error('Recording is not in progress')
       return
     }
 
     if (!(track instanceof MediaStreamTrack)) {
-      console.error('Invalid arugment')
+      logger.error('Invalid arugment')
       return
     }
 
     if (!audioContext) {
-      console.error('no audio context')
+      logger.error('no audio context')
       return
     }
 
     if (!audioDestination) {
-      console.error('no audioDestination')
+      logger.error('no audioDestination')
       return
     }
 
@@ -64,12 +65,12 @@ export function createMediaRecorder(
 
   function deleteAudioTrack(track: MediaStreamTrack) {
     if (!isRecording) {
-      console.error('Recording is not in progress')
+      logger.error('Recording is not in progress')
       return
     }
 
     if (!(track instanceof MediaStreamTrack)) {
-      console.error('Invalid argument')
+      logger.error('Invalid argument')
       return
     }
 
@@ -99,7 +100,7 @@ export function createMediaRecorder(
     try {
       targetStream = await createTargetStream(stream)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       return Promise.reject('TargetStream Error')
     }
 
@@ -107,7 +108,7 @@ export function createMediaRecorder(
     try {
       mediaRecorder = new MediaRecorder(targetStream, options)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       return Promise.reject('MediaRecorder Error')
     }
 
@@ -191,7 +192,7 @@ export function createMediaRecorder(
 
   function pauseRecording() {
     if (mediaRecorder?.state === 'paused') {
-      console.error('Unable to pause recording: Recording is already paused')
+      logger.error('Unable to pause recording: Recording is already paused')
       return
     }
 
@@ -200,7 +201,7 @@ export function createMediaRecorder(
 
   function resumeRecording() {
     if (mediaRecorder?.state !== 'paused') {
-      console.error(
+      logger.error(
         'Unable to resume recording: Recording is already in progress',
       )
       return
@@ -211,7 +212,7 @@ export function createMediaRecorder(
 
   function stopRecording() {
     if (!isRecording) {
-      console.error('Unable to stop recording: Recording is not in progress')
+      logger.error('Unable to stop recording: Recording is not in progress')
       return
     }
 
@@ -224,17 +225,17 @@ export function createMediaRecorder(
     blobList?: Blob[],
   ) {
     if (!recordedBlobList.length && !blobList?.length) {
-      console.error('Unable to save recording: There is no recorded data')
+      logger.error('Unable to save recording: There is no recorded data')
       return
     }
 
     if (!supportedMimeType) {
-      console.error('Unable to save recording: There is no supported type')
+      logger.error('Unable to save recording: There is no supported type')
       return
     }
 
     const fileNameWithExt = `${fileName}${supportedMimeType.extension}`
-    console.log('[Recorder] saving chunk: ', fileNameWithExt)
+    logger.log('[Recorder] saving chunk: ', fileNameWithExt)
     try {
       await saveFile(
         blobList || recordedBlobList,
@@ -242,8 +243,8 @@ export function createMediaRecorder(
         fileNameWithExt,
       )
     } catch (e: unknown) {
-      if (e instanceof Error) console.error(e.message)
-      else console.error('Unable to save recording.')
+      if (e instanceof Error) logger.error(e.message)
+      else logger.error('Unable to save recording.')
     }
   }
 
